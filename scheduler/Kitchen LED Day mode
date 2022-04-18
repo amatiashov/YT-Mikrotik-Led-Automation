@@ -1,0 +1,4 @@
+Start Time  06:00:00
+Interval    1d 00:00:00
+
+/system scheduler enable "Discover Devices And Process Kitchen Led Logic"

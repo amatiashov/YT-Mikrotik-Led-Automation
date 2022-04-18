@@ -1,0 +1,58 @@
+:global getTimeInSeconds;
+:global kitchenLedState;
+:global sendTelegramNotification;
+:global changeKitchenLedState;
+:global discoveryDevices;
+:global persist;
+:global lastSeenPrefix;
+:global kitchenLedOnline;
+:global sendExternalHomeStateRequest;
+
+
+:local atHome fale;
+:local onlineDevicesString "";
+
+
+:if ([ :typeof $kitchenLedState ] = "nothing") do={:set kitchenLedState false};
+
+
+:local currentTime [$getTimeInSeconds];
+:local separator "";
+:foreach k,v in $discoveryDevices do={
+   :put "Checking $k";
+   :local lastSeenDevice [$persist ($lastSeenPrefix . $k . $v)];
+   :put "Last Seen: $lastSeenDevice"
+   if ([:typeof $lastSeenDevice] = "nothing") do={
+     :set lastSeenDevice -1;
+   }
+
+   :if ($currentTime - [:tonum $lastSeenDevice] <= 5)  do={
+      :set atHome true;
+      :if ($onlineDevicesString = "") do={
+        :set onlineDevicesString "$k";
+      } else {
+        :set onlineDevicesString ($onlineDevicesString . ", " . "$k");
+      }
+   }
+}
+ 
+
+
+:put $onlineDevicesString;
+:put "kitchenLedOnline $kitchenLedOnline";
+
+# if at home
+:if ($atHome = true && $kitchenLedState != true) do={
+   :set kitchenLedState true;
+   :local msg "ON kitchen led. Online devices: $onlineDevicesString";
+   $changeKitchenLedState kitchenLedState=$kitchenLedState;
+   $sendTelegramNotification telegramMsg=$msg
+}
+
+# if away - send OFF command
+:if ($atHome != true && $kitchenLedState = true) do={
+   :set kitchenLedState false;
+   $changeKitchenLedState kitchenLedState=$kitchenLedState;
+   $sendTelegramNotification telegramMsg="OFF kitchen led. No one's home";
+}
+

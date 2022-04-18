@@ -1,0 +1,13 @@
+Start Time  22:00:00
+Interval    1d 00:00:00
+
+:global changeKitchenLedState;
+:global kitchenLedState;
+:global cleanPersist;
+
+/system scheduler disable "Discover Devices And Process Kitchen Led Logic"
+:delay 15;
+
+$cleanPersist;
+:set kitchenLedState false;
+$changeKitchenLedState kitchenLedState=$kitchenLedState;

@@ -1,0 +1,10 @@
+:global discoveryDevices {
+  "Device Displayed Name"=<device-ip>;
+};
+
+
+:global lastSeenPrefix "lastSeen";
+:global telegramChatId "<CHAT_ID>";
+:global telegramAccessToken "<TELEGRAM_BOT_TOKEN>";
+:global yandexIotToken "<TOKEN>";
+:global kitchenLedDeviceId "<DEVICE-ID>";

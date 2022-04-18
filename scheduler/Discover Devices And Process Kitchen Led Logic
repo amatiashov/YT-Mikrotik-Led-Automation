@@ -1,0 +1,5 @@
+Start Time  00:00:00
+Interval    00:00:10
+
+/system script run discoverDevices
+/system script run checkDevicesStatusAndChangeKitchenLedStatus	

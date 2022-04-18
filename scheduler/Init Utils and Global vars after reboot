@@ -1,0 +1,5 @@
+Start Time  startup
+Interval    00:00:00
+
+/system script run initUtils
+/system script run initGlobalVars

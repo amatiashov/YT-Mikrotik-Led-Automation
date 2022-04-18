@@ -1,0 +1,54 @@
+
+:global sendTelegramNotification do={
+  :global telegramAccessToken;
+  :global telegramChatId;
+  :tool fetch http-method=get mode=https url="https://api.telegram.org/bot$telegramAccessToken/sendMessage?chat_id=$telegramChatId&text=$telegramMsg"
+}
+
+
+:global changeKitchenLedState do={
+  :global kitchenLedDeviceId;
+  :global yandexIotToken;
+  :tool fetch http-method=post mode=https http-header-field="content-type:application/json, Authorization:Bearer $yandexIotToken" http-data="{\"devices\":[{\"id\":\"$kitchenLedDeviceId\",\"actions\":[{\"type\":\"devices.capabilities.on_off\",\"state\":{\"instance\":\"on\",\"value\":$kitchenLedState}}]}]}" url="https://api.iot.yandex.net/v1.0/devices/actions"
+}
+
+
+:global getTimeInSeconds do={
+  :local time [/system clock get time];
+  :local hours [:pick $time 0 2];
+  :local minutes [:pick $time 3 5];
+  :local seconds [:pick $time 6 8];
+
+  :put $hours;
+  :put $minutes;
+  :put $seconds;
+
+  :return ($hours * 60 * 60 + $minutes * 60 + $seconds);
+}
+
+
+:global persist do={
+
+    :local varName $1
+    :local varValue $2
+    :local varID [/ip firewall layer7-protocol find name="$varName"]
+
+    :if ([:typeof $varValue] = "nothing") do={
+        :if ($varID != "") do={
+            :set $varValue [/ip firewall layer7-protocol get $varID value-name=regexp]
+        }
+    } else={
+        :if ($varID = "") do={
+            /ip firewall layer7-protocol add name="$varName" regexp="$varValue" comment="PersistTag"
+        } else={
+            /ip firewall layer7-protocol set $varID regexp="$varValue"
+        }
+    }
+
+    return $varValue
+
+}
+
+:global cleanPersist do={
+  /ip firewall layer7-protocol remove numbers=[find comment="PersistTag"] 
+}

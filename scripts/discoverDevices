@@ -1,0 +1,14 @@
+:global persist
+:global discoveryDevices
+:global lastSeenPrefix
+:global getTimeInSeconds
+
+
+:foreach k,v in $discoveryDevices do={
+  :put $k;
+  :put $v;
+  :if ([/ping address=$v count=2] != 0)  do={
+    $persist ($lastSeenPrefix . $k . $v) [$getTimeInSeconds];
+  }
+}
+
